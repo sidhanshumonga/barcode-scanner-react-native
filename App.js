@@ -11,6 +11,7 @@ import {Text, View, StyleSheet, Dimensions, SafeAreaView} from 'react-native';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {Header} from 'react-native-elements';
 import CreateBarcode from './components/create-barcode/create-barcode';
+import ScanBarcode from './components/scan-barcode/scan-barcode';
 
 const FirstRoute = () => (
   // <View style={[styles.scene, {backgroundColor: 'white'}]} />
@@ -18,7 +19,7 @@ const FirstRoute = () => (
 );
 
 const SecondRoute = () => (
-  <View style={[styles.scene, {backgroundColor: '#673ab7'}]} />
+  <ScanBarcode/>
 );
 
 const initialLayout = {width: Dimensions.get('window').width};

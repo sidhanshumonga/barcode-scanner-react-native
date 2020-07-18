@@ -12,6 +12,14 @@ target 'BarcodeScanner' do
 
   pod 'ReactNativeART', :path => '../node_modules/@react-native-community/art'
 
+  pod 'react-native-view-shot', :path => '../node_modules/react-native-view-shot'
+
+  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
+
+  pod 'react-native-image-editor', :path => '../node_modules/@react-native-community/image-editor'
+
+  pod 'react-native-image-base64', :path => '../node_modules/react-native-image-base64'
+
   target 'BarcodeScannerTests' do
     inherit! :complete
     # Pods for testing
