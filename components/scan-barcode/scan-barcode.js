@@ -1,33 +1,64 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, TouchableHighlight, Alert} from 'react-native';
-import {Input} from 'react-native-elements';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableHighlight,
+  TouchableOpacity,
+  Alert,
+  Keyboard,
+} from 'react-native';
+import {Input, Icon} from 'react-native-elements';
 import {RNCamera} from 'react-native-camera';
 import BarcodeMask from 'react-native-barcode-mask';
 
 export default function ScanBarcode() {
-  const [barcodes, setBarcodes] = React.useState([]);
-
   const [alertPresent, setAlertPresent] = React.useState(false);
+  const [torch, setTorch] = React.useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = React.useState(false);
   const [barcodeValue, setBarcodeValue] = React.useState('');
 
-  const changeName = (val) => {
-    if (val === '') {
-      setBarcode(null);
+  React.useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const updateTorch = () => {
+    console.log('here');
+    if (torch) {
+      setTorch(false);
+    } else {
+      setTorch(true);
     }
-    setName(val);
   };
 
   barcodeRecognized = ({barcodes}) => {
     if (!alertPresent) {
-      setBarcodes(barcodes[0].data.includes('error') ? [] : barcodes);
       if (!barcodes[0].data.includes('error')) {
         setBarcodeValue(barcodes[0].data);
       }
     }
   };
 
-  const scanBarcode = () => {
-    if(barcodeValue){setAlertPresent(true);}
+  scanBarcode = () => {
+    if (barcodeValue) {
+      setAlertPresent(true);
+    }
   };
 
   React.useEffect(() => {
@@ -35,7 +66,10 @@ export default function ScanBarcode() {
       Alert.alert('Scanned barcode', barcodeValue, [
         {
           text: 'Okay',
-          onPress: () => { setAlertPresent(false); setBarcodeValue('')},
+          onPress: () => {
+            setAlertPresent(false);
+            setBarcodeValue('');
+          },
           style: 'cancel',
         },
       ]);
@@ -44,25 +78,41 @@ export default function ScanBarcode() {
 
   return (
     <View style={styles.scene}>
-      <Input value={barcodeValue} placeholder="Search barcode" />
-      <Text style={styles.textOr}>OR</Text>
-      <RNCamera
-        ref={(ref) => {
-          this.camera = ref;
-        }}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        captureAudio={false}
-        onGoogleVisionBarcodesDetected={this.barcodeRecognized}
-        googleVisionBarcodeType={
-          alertPresent
-            ? 0
-            : RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType
-                .CODE_128
-        }
-        style={styles.scanner}>
-        <BarcodeMask />
-      </RNCamera>
+      <Input
+        value={barcodeValue}
+        placeholder="Search barcode"
+      />
+      <TouchableOpacity onPress={updateTorch} styles={styles.torchPlace}>
+        <Icon
+          name={torch ? 'flash-off' : 'flash-on'}
+          size={25}
+          color="#2196f3"
+          iconStyle={styles.flashIcon}
+        />
+      </TouchableOpacity>
+      {isKeyboardVisible ? null : (
+        <RNCamera
+          ref={(ref) => {
+            this.camera = ref;
+          }}
+          type={RNCamera.Constants.Type.back}
+          flashMode={
+            torch
+              ? RNCamera.Constants.FlashMode.torch
+              : RNCamera.Constants.FlashMode.off
+          }
+          captureAudio={false}
+          onGoogleVisionBarcodesDetected={barcodeRecognized}
+          googleVisionBarcodeType={
+            alertPresent
+              ? 0
+              : RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType
+                  .CODE_128
+          }
+          style={styles.scanner}>
+          <BarcodeMask edgeRadius={10} lineAnimationDuration={900} />
+        </RNCamera>
+      )}
       <TouchableHighlight
         onPress={scanBarcode}
         style={styles.footer}
@@ -98,14 +148,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  textOr: {
-    textAlign: 'center',
-  },
   scanner: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    margin: 30,
-    marginBottom: 60,
+    marginTop: 20,
+    marginLeft: 30,
+    marginRight: 30,
+    zIndex:1,
+    marginBottom: 70,
   },
+  torchPlace: {
+    marginBottom: 20,
+  }
 });
