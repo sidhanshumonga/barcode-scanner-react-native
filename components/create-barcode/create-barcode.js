@@ -22,9 +22,6 @@ import moment from 'moment'
 export default function CreateBarcode() {
   const image = React.useRef(null);
   const [name, setName] = React.useState("");
-  const [randomNum, setRandomNum] = React.useState(
-    Math.floor(Math.random() * 1000)
-  );
   const [barcode, setBarcode] = React.useState(null);
   const [prints, setNumberOfPrints] = React.useState(0);
 
@@ -33,8 +30,7 @@ export default function CreateBarcode() {
   //   const [hasPermission, setHasPermission] = React.useState(null);
 
   const genrateBarcode = () => {
-    setRandomNum(Math.floor(Math.random() * 1000));
-    setBarcode(name.substr(0, 3).toUpperCase() + randomNum + moment(new Date()).format('DDMMYY'));
+    setBarcode(name);
     Keyboard.dismiss();
   };
 
@@ -132,7 +128,8 @@ export default function CreateBarcode() {
       <Input
         value={name}
         onChangeText={(text) => changeName(text)}
-        placeholder="Enter Customer Name"
+        placeholder="Enter Customer ID"
+        maxLength={12}
       />
       <Input
         keyboardType="number-pad"
